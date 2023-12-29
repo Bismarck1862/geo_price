@@ -24,3 +24,4 @@
 ```
 dvc pull
 ```
+Po zalogowaniu w przeglądarce plik autoryzacyjny zapisze się w lokalizacji `../mycredentials.json`
