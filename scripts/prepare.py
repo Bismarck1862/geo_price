@@ -63,10 +63,10 @@ def _no_yes_to_num(data_df, feature_columns):
     return data_df
 
 
-def preprocess():
+def preprocess(city):
     print("Preprocessing...")
     start_time = time()
-    prices = load_prices()
+    prices = load_prices(city)
     feature_columns = get_features(prices)
     prices, feature_columns = clean_data(prices, feature_columns)
 

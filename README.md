@@ -8,17 +8,18 @@
     ├── prepare.py # czyszczenie kolumn i wekoryzacja
     ├── dataset.py # utworzenie datasetu
     ├── autoencoder.py # implementacja autoenkodera
-    └── train.py # tranowanie autoenkodera
+    ├── encode.py # tranowanie autoenkodera
+    └── train.py # tranowanie regresji za pomocą KNN
 └── data
     ├── prices # folder z danymi o cenach mieszkań
     └── demographic # folder z danymi demograficznymi
 ```
 
 ### TO DO (dla części bez danych przestrzennych):
-- Dodanie requirements.txt
-- Wytrenowanie autoenkodera
-- Regresja za pomocą KNN
-- Wizaualizacja / Ewalizacja wyników
+- [x] Dodanie requirements.txt
+- [x] Wytrenowanie autoenkodera
+- [x] Regresja za pomocą KNN
+- [x] Wizualizacja / Ewalizacja wyników
 
 ### Pozyskanie danych:
 ```

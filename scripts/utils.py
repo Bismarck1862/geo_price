@@ -23,7 +23,7 @@ def _file_generator(dir_path: str) -> str:
             yield root_path
 
 
-def load_prices(city="wroclaw", rent=False) -> pd.DataFrame:
+def load_prices(city, rent=False) -> pd.DataFrame:
     dfs = []
     for file in _file_generator(DATA_PRICES):
         if rent:

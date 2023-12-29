@@ -74,19 +74,18 @@ class Autoencoder(nn.Module):
         :param n_decoder_hidden_features: number of neurons in decoder's hidden layer
         :param n_latent_features: number of latent features
         """
-        encoder = Encoder(
+        super().__init__()
+        self.encoder = Encoder(
             n_input_features=n_data_features,
             n_hidden_neurons=n_encoder_hidden_features,
             n_latent_features=n_latent_features,
         )
-        decoder = Decoder(
+        self.decoder = Decoder(
             n_latent_features=n_latent_features,
             n_hidden_neurons=n_decoder_hidden_features,
             n_output_features=n_data_features,
         )
-        super().__init__(
-            encoder=encoder, decoder=decoder, n_latent_features=n_latent_features
-        )
+        self.n_latent_features = n_latent_features
         self.input_shape = None
 
     def encoder_forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -99,3 +98,6 @@ class Autoencoder(nn.Module):
     def decoder_forward(self, x: torch.Tensor) -> torch.Tensor:
         """Function to perform forward pass through decoder network."""
         return self.decoder(x).view(-1, *self.input_shape)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.decoder_forward(self.encoder_forward(x))
