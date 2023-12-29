@@ -1,37 +1,49 @@
-import json
-import os
-import warnings
-from statistics import mean
-from typing import Any, Dict, List
+import numpy as np
+import torch
+from tqdm import tqdm
 
-import click
-import matplotlib.pyplot as plt
-import pandas as pd
-import seaborn as sns
-import spacy
-import yaml
-from scipy.sparse import csr_matrix
-from sklearn.compose import ColumnTransformer
-from sklearn.decomposition import TruncatedSVD
-from sklearn.dummy import DummyClassifier
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.experimental import enable_halving_search_cv
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
-from sklearn.feature_selection import VarianceThreshold
-from sklearn.metrics import classification_report
-from sklearn.model_selection import (GridSearchCV, HalvingGridSearchCV,
-                                     HalvingRandomSearchCV, RandomizedSearchCV,
-                                     cross_validate)
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OrdinalEncoder, StandardScaler
-from sklearn.svm import SVC
+from .autoencoder import Autoencoder
+from .dataset import get_dataloader
 
-from utils import write_to_markdown
-
-warnings.filterwarnings('ignore')
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print("Using device", device)
 
 
-def get_data(dataset_name: str) -> pd.DataFrame:
-    data_dir = os.path.join("data", "prepared", dataset_name)
-    data_path = os.path.join(data_dir, "data.json")
-    return pd.read_json(data_path)
+def train(autoencoder, data, epochs=20, lr=0.001):
+    opt = torch.optim.Adam(autoencoder.parameters(), lr=lr)
+    train_metrics = {
+        "loss": [],
+        "epoch": []
+    }
+    for epoch in tqdm(range(epochs)):
+        loss_list = np.array([])
+        for x, y in data:
+            x = x.to(device)
+            opt.zero_grad()
+            x_hat = autoencoder(x)
+            loss = ((x - x_hat)**2).sum()
+            loss.backward()
+            opt.step()
+            loss_list = np.append(loss_list, loss.item())
+        mean_loss = np.mean(loss_list)
+        train_metrics["loss"].append(mean_loss)
+        train_metrics["epoch"].append(epoch)
+        print(f"Epoch [{epoch+1}/{epochs}], avg_loss: {mean_loss:.4f}")
+    return autoencoder, train_metrics
+
+
+if __name__ == "__main__":
+    autoencoder = Autoencoder(
+        n_data_features=16,
+        n_encoder_hidden_features=128,
+        n_decoder_hidden_features=128,
+        n_latent_features=32,
+    ).to(device)
+    train_data, _, _, _ = get_dataloader(batch_size=32)
+    print("Training...")
+    autoencoder, train_metrics = train(
+        autoencoder, train_data, epochs=20, lr=0.001)
+    torch.save(autoencoder.state_dict(), "autoencoder.pth")
+    print("Saved model to autoencoder.pth")
+    print("Training metrics:", train_metrics)
+    print("Done!")
