@@ -10,22 +10,24 @@ from .utils import load_prices
 
 def get_features(data_df, geo=False):
     all_features = data_df.columns.to_list()
-    exclude = ['id', 'price']
-    geo_features = ['latitude', 'longitude', 'poiCount',
-                    *[col for col in all_features if 'Distance' in col]]
+    exclude = ["id", "price"]
+    geo_features = [
+        "latitude",
+        "longitude",
+        "poiCount",
+        *[col for col in all_features if "Distance" in col],
+    ]
     if geo:
         features = [col for col in all_features if col not in exclude]
         return features
     else:
-        features = [
-            col for col in all_features if col not in exclude +
-            geo_features]
+        features = [col for col in all_features if col not in exclude + geo_features]
         return features
 
 
 def clean_data(data_df, feature_columns):
     to_remove = _check_nan(data_df, feature_columns)
-    to_remove += ['id']
+    to_remove += ["id"]
     print(f"Removing {len(to_remove)} features {to_remove}")
     feature_columns = [col for col in feature_columns if col not in to_remove]
     data_df = data_df.drop(to_remove, axis=1)
@@ -48,7 +50,7 @@ def _check_nan(data, features):
 
 def _fill_nan_with_median(data_df, feature_columns):
     for feature in feature_columns:
-        if data_df[feature].dtype == 'O':
+        if data_df[feature].dtype == "O":
             data_df[feature].fillna(data_df[feature].mode()[0], inplace=True)
         else:
             data_df[feature].fillna(data_df[feature].median(), inplace=True)
@@ -57,9 +59,11 @@ def _fill_nan_with_median(data_df, feature_columns):
 
 def _no_yes_to_num(data_df, feature_columns):
     for feature in feature_columns:
-        if data_df[feature].dtype == 'O' and set(
-                data_df[feature].unique()) == {'no', 'yes'}:
-            data_df[feature] = data_df[feature].map({'no': 0, 'yes': 1})
+        if data_df[feature].dtype == "O" and set(data_df[feature].unique()) == {
+            "no",
+            "yes",
+        }:
+            data_df[feature] = data_df[feature].map({"no": 0, "yes": 1})
     return data_df
 
 
@@ -70,24 +74,19 @@ def preprocess(city):
     feature_columns = get_features(prices)
     prices, feature_columns = clean_data(prices, feature_columns)
 
-    numeric_transformer = Pipeline(steps=[
-        ('scaler', StandardScaler())
-    ])
+    numeric_transformer = Pipeline(steps=[("scaler", StandardScaler())])
 
-    categorical_transformer = Pipeline(steps=[
-        ('onehot', OneHotEncoder())
-    ])
+    categorical_transformer = Pipeline(steps=[("onehot", OneHotEncoder())])
 
-    numeric_features = [
-        col for col in feature_columns if prices[col].dtype != 'O']
-    categorical_features = [
-        col for col in feature_columns if prices[col].dtype == 'O']
+    numeric_features = [col for col in feature_columns if prices[col].dtype != "O"]
+    categorical_features = [col for col in feature_columns if prices[col].dtype == "O"]
 
     preprocessor = ColumnTransformer(
         transformers=[
-            ('num', numeric_transformer, numeric_features),
-            ('cat', categorical_transformer, categorical_features)
-        ])
+            ("num", numeric_transformer, numeric_features),
+            ("cat", categorical_transformer, categorical_features),
+        ]
+    )
 
     print(f"Preprocessing took {time() - start_time:.2f} seconds")
     return preprocessor, prices

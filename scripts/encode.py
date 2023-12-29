@@ -11,10 +11,7 @@ print("Using device", device)
 
 def train_encoder(autoencoder, data, epochs=20, lr=0.001):
     opt = torch.optim.Adam(autoencoder.parameters(), lr=lr)
-    train_metrics = {
-        "loss": [],
-        "epoch": []
-    }
+    train_metrics = {"loss": [], "epoch": []}
     for epoch in tqdm(range(epochs)):
         loss_list = np.array([])
         print(data.__iter__())
@@ -22,7 +19,7 @@ def train_encoder(autoencoder, data, epochs=20, lr=0.001):
             x = x.to(device)
             opt.zero_grad()
             x_hat = autoencoder(x)
-            loss = ((x - x_hat)**2).sum()
+            loss = ((x - x_hat) ** 2).sum()
             loss.backward()
             opt.step()
             loss_list = np.append(loss_list, loss.item())
@@ -43,7 +40,8 @@ if __name__ == "__main__":
     train_data, _ = get_dataloader(batch_size=32)
     print("Training...")
     autoencoder, train_metrics = train_encoder(
-        autoencoder, train_data, epochs=100, lr=0.0001)
+        autoencoder, train_data, epochs=100, lr=0.0001
+    )
     torch.save(autoencoder.state_dict(), "autoencoder.pth")
     print("Saved model to autoencoder.pth")
     print("Training metrics:", train_metrics)

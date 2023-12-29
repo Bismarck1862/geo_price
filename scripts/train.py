@@ -1,4 +1,3 @@
-from sklearn.decomposition import PCA
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.metrics import mean_squared_error
 from tqdm import tqdm
@@ -20,6 +19,7 @@ def encode_data(autoencoder, data, device):
         ys.append(y.numpy())
     return np.vstack(encoded_data), np.hstack(ys)
 
+
 def train_knn(train_dataloader, autoencoder, device, n_neighbors=5):
     print("Encoding data...")
     X_train, y_train = encode_data(autoencoder, train_dataloader, device)
@@ -40,11 +40,6 @@ def visualize_results(test_data, autoencoder, knn, device):
     ax.set_title(f"MSE: {mse:.2f}")
     ax.legend()
     plt.savefig("results.png")
-
-
-
-
-
 
 
 if __name__ == "__main__":
