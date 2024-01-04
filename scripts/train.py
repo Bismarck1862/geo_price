@@ -1,3 +1,4 @@
+import json
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.metrics import mean_squared_error
 from tqdm import tqdm
@@ -33,13 +34,33 @@ def train_knn(train_dataloader, autoencoder, device, n_neighbors=5):
 def visualize_results(test_data, autoencoder, knn, device):
     X_test, y_test = encode_data(autoencoder, test_data, device)
     y_pred = knn.predict(X_test)
-    mse = mean_squared_error(y_test, y_pred)
     fig, ax = plt.subplots(figsize=(10, 5))
     ax.hist(y_test, bins=50, alpha=0.5, label="True prices")
     ax.hist(y_pred, bins=50, alpha=0.5, label="Predicted prices")
-    ax.set_title(f"MSE: {mse:.2f}")
+    ax.set_title("Distribution of predicted and true prices")
     ax.legend()
     plt.savefig("results.png")
+
+    mse = mean_squared_error(y_test, y_pred)
+    mae = np.mean(np.abs(y_test - y_pred))
+    mape = np.mean(np.abs((y_test - y_pred) / y_test)) * 100
+    huber_loss = np.mean(
+        np.where(
+            np.abs(y_test - y_pred) < 1,
+            0.5 * (y_test - y_pred) ** 2,
+            np.abs(y_test - y_pred) - 0.5,
+        )
+    )
+
+    report = {
+        "Mean squared error": format(mse, ".2f"),
+        "Mean absolute error": format(mae, ".2f"),
+        "Mean absolute percentage error": format(mape, ".2f"),
+        "Huber loss": format(huber_loss, ".2f"),
+    }
+
+    with open("report.json", "w") as f:
+        json.dump(report, f)
 
 
 if __name__ == "__main__":
