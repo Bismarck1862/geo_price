@@ -15,11 +15,8 @@
     └── demographic # folder z danymi demograficznymi
 ```
 
-### TO DO (dla części bez danych przestrzennych):
-- [x] Dodanie requirements.txt
-- [x] Wytrenowanie autoenkodera
-- [x] Regresja za pomocą KNN
-- [x] Wizualizacja / Ewalizacja wyników
+### TO DO
+- [ ] demo
 
 ### Pozyskanie danych:
 ```

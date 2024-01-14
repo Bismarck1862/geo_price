@@ -22,6 +22,7 @@ def get_dataloader(city=None, batch_size=32, run_type=RunTypes.NON_GEO.value):
     preprocessor.fit(X_train)
     X_train_vectorized = preprocessor.transform(X_train)
     X_test_vectorized = preprocessor.transform(X_test)
+    print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
 
     train_dataset = torch.utils.data.TensorDataset(
         torch.Tensor(X_train_vectorized), torch.Tensor(y_train.values)

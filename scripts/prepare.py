@@ -1,12 +1,18 @@
+import warnings
 from time import time
 
+import geopandas as gpd
 import pandas as pd
+from shapely.geometry import Point
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from tqdm import tqdm
 
+from .geo_emb import get_embeddings
 from .utils import RunTypes, load_prices
 
+warnings.filterwarnings("ignore")
 
 def get_features(data_df, run_type=RunTypes.NON_GEO.value):
     all_features = data_df.columns.to_list()
@@ -28,6 +34,7 @@ def get_features(data_df, run_type=RunTypes.NON_GEO.value):
 def clean_data(data_df, feature_columns):
     to_remove = _check_nan(data_df, feature_columns)
     to_remove += ["id"]
+    to_remove += [col for col in data_df.columns if col not in [*feature_columns, "price"]]
     print(f"Removing {len(to_remove)} features {to_remove}")
     feature_columns = [col for col in feature_columns if col not in to_remove]
     data_df = data_df.drop(to_remove, axis=1)
@@ -66,12 +73,12 @@ def _no_yes_to_num(data_df, feature_columns):
             data_df[feature] = data_df[feature].map({"no": 0, "yes": 1})
     return data_df
 
-
 def preprocess(city, run_type=RunTypes.NON_GEO.value):
     print("Preprocessing...")
     start_time = time()
     prices = load_prices(city)
     feature_columns = get_features(prices, run_type=run_type)
+    print(f"Number of features: {len(feature_columns)}")
     prices, feature_columns = clean_data(prices, feature_columns)
 
     numeric_transformer = Pipeline(steps=[("scaler", StandardScaler())])
@@ -87,6 +94,43 @@ def preprocess(city, run_type=RunTypes.NON_GEO.value):
             ("cat", categorical_transformer, categorical_features),
         ]
     )
+    if run_type == RunTypes.GEO_OSM.value:
+        geometries = [Point(longitude, latitude) \
+                    for longitude, latitude in zip(prices["longitude"],
+                                                    prices["latitude"])]
+        cites = [f"{city.title()}, Poland" for city in list(prices["city"].unique())]
+        hex_embeddings, highway_embeddings, region_gdfs = gpd.GeoDataFrame(), \
+            gpd.GeoDataFrame(), gpd.GeoDataFrame()
 
+        for city in tqdm(cites):
+            print(f"Getting embeddings for {city}")
+            hex_embedding, highway_embedding, region_gdf = get_embeddings(city)
+            hex_embeddings = pd.concat([hex_embeddings, hex_embedding])
+            highway_embeddings = pd.concat([highway_embeddings, highway_embedding])
+            region_gdfs = pd.concat([region_gdfs, region_gdf])
+    
+        regions_list = []
+        for point in tqdm(geometries):
+            region = region_gdfs[region_gdfs["geometry"].contains(point)]
+            if region.shape[0] == 0:
+                regions_list.append(-1)
+            else:
+                regions_list.append(list(region.to_dict()["geometry"].keys())[0])
+        
+        prices["region_id"] = regions_list
+        hex_embeddings.columns = [f"hex_{col}" for col in hex_embeddings.columns]
+        highway_embeddings.columns = [f"highway_{col}" for col in highway_embeddings.columns]
+        prices = prices.merge(hex_embeddings, on="region_id")
+        prices = prices.merge(highway_embeddings, on="region_id")
+
+
+    preprocessor = ColumnTransformer(
+        transformers=[
+            ("num", numeric_transformer, numeric_features),
+            ("cat", categorical_transformer, categorical_features),
+            ("geo", "passthrough", [col for col in prices.columns if "hex_" in col] + \
+                [col for col in prices.columns if "highway_" in col]),
+        ]
+    )
     print(f"Preprocessing took {time() - start_time:.2f} seconds")
     return preprocessor, prices

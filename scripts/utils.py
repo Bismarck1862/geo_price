@@ -20,7 +20,7 @@ class RunTypes(Enum):
 TYPES_MAP = {
     RunTypes.NON_GEO.value: 31,
     RunTypes.GEO.value: 42,
-    RunTypes.GEO_OSM.value: 42,
+    RunTypes.GEO_OSM.value: 82,
 }
 
 

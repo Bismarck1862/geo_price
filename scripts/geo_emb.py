@@ -11,7 +11,6 @@ HEX_TAGS = {
         "leisure": "park",
         "landuse": "forest",
         "amenity": ["bar", "restaurant", "cafe"],
-        "water": "river",
         "sport": "soccer",
     }
 
@@ -71,10 +70,8 @@ def highway2vec(regions_gdf, edges_gdf):
 
 def get_embeddings(city_name="Wrocław, Poland"):
     area_gdf, regions_gdf = load_area_and_regions(city_name)
-    regionalizer = H3Regionalizer(9)
-    regions_gdf = regionalizer.transform(area_gdf)
     features_gdf = load_features(area_gdf)
     edges_gdf = load_edges(area_gdf)
     hex_embeddings = hex2vec(regions_gdf, features_gdf)
     highway_embeddings = highway2vec(regions_gdf, edges_gdf)
-    return hex_embeddings, highway_embeddings
+    return hex_embeddings, highway_embeddings, regions_gdf
