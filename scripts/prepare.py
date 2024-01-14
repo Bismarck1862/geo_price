@@ -5,10 +5,10 @@ from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-from .utils import load_prices
+from .utils import RunTypes, load_prices
 
 
-def get_features(data_df, geo=False):
+def get_features(data_df, run_type=RunTypes.NON_GEO.value):
     all_features = data_df.columns.to_list()
     exclude = ["id", "price"]
     geo_features = [
@@ -17,7 +17,7 @@ def get_features(data_df, geo=False):
         "poiCount",
         *[col for col in all_features if "Distance" in col],
     ]
-    if geo:
+    if run_type in [RunTypes.GEO.value, RunTypes.GEO_OSM.value]:
         features = [col for col in all_features if col not in exclude]
         return features
     else:
@@ -67,11 +67,11 @@ def _no_yes_to_num(data_df, feature_columns):
     return data_df
 
 
-def preprocess(city):
+def preprocess(city, run_type=RunTypes.NON_GEO.value):
     print("Preprocessing...")
     start_time = time()
     prices = load_prices(city)
-    feature_columns = get_features(prices)
+    feature_columns = get_features(prices, run_type=run_type)
     prices, feature_columns = clean_data(prices, feature_columns)
 
     numeric_transformer = Pipeline(steps=[("scaler", StandardScaler())])

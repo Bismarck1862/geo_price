@@ -1,5 +1,6 @@
 import os
 import warnings
+from enum import Enum
 
 import geopandas as gpd
 import pandas as pd
@@ -8,6 +9,19 @@ warnings.filterwarnings("ignore")
 
 DATA_DEMOG = "./data/demographic/"
 DATA_PRICES = "./data/prices/"
+
+
+class RunTypes(Enum):
+    NON_GEO = "non_geo"
+    GEO = "geo"
+    GEO_OSM = "geo_osm"
+
+
+TYPES_MAP = {
+    RunTypes.NON_GEO.value: 31,
+    RunTypes.GEO.value: 42,
+    RunTypes.GEO_OSM.value: 42,
+}
 
 
 def _file_generator(dir_path: str) -> str:

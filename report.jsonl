@@ -1,0 +1,2 @@
+{"run type": "non_geo", "metrics": {"Mean squared error": "27841175552.00", "Mean absolute error": "101978.26", "Mean absolute percentage error": "13.72", "Huber loss": "101977.77"}}
+{"run type": "geo", "metrics": {"Mean squared error": "25400487936.00", "Mean absolute error": "98098.10", "Mean absolute percentage error": "13.43", "Huber loss": "98097.60"}}

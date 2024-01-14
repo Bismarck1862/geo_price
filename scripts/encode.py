@@ -4,6 +4,7 @@ from tqdm import tqdm
 
 from .autoencoder import Autoencoder
 from .dataset import get_dataloader
+from .utils import TYPES_MAP, RunTypes
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("Using device", device)
@@ -30,19 +31,24 @@ def train_encoder(autoencoder, data, epochs=20, lr=0.001):
     return autoencoder, train_metrics
 
 
-if __name__ == "__main__":
+def run_encoding(run_type=RunTypes.NON_GEO.value):
     autoencoder = Autoencoder(
-        n_data_features=31,
+        n_data_features=TYPES_MAP[run_type],
         n_encoder_hidden_features=128,
         n_decoder_hidden_features=128,
         n_latent_features=16,
     ).to(device)
-    train_data, _ = get_dataloader(batch_size=32)
+    train_data, _ = get_dataloader(batch_size=32, run_type=run_type)
     print("Training...")
     autoencoder, train_metrics = train_encoder(
         autoencoder, train_data, epochs=100, lr=0.0001
     )
-    torch.save(autoencoder.state_dict(), "autoencoder.pth")
-    print("Saved model to autoencoder.pth")
+    save_path = f"autoencoder_{run_type}.pth"
+    torch.save(autoencoder.state_dict(), save_path)
+    print(f"Saved model to {save_path}")
     print("Training metrics:", train_metrics)
     print("Done!")
+
+
+# if __name__ == "__main__":
+#     run_encoding(geo=True)

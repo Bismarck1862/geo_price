@@ -3,13 +3,14 @@ from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
 
 from .prepare import preprocess
+from .utils import RunTypes
 
 RANDOM_STATE = 42
 
 
-def get_dataloader(city=None, batch_size=32):
+def get_dataloader(city=None, batch_size=32, run_type=RunTypes.NON_GEO.value):
     """Load data into DataLoader."""
-    preprocessor, data_df = preprocess(city)
+    preprocessor, data_df = preprocess(city, run_type=run_type)
     print("Splitting data...")
     X_train, X_test, y_train, y_test = train_test_split(
         data_df.drop("price", axis=1),

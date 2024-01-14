@@ -1,13 +1,15 @@
 import json
-from sklearn.neighbors import KNeighborsRegressor
-from sklearn.metrics import mean_squared_error
-from tqdm import tqdm
+
+import matplotlib.pyplot as plt
 import numpy as np
 import torch
-import matplotlib.pyplot as plt
+from sklearn.metrics import mean_squared_error
+from sklearn.neighbors import KNeighborsRegressor
+from tqdm import tqdm
 
-from scripts.autoencoder import Autoencoder
-from scripts.dataset import get_dataloader
+from .autoencoder import Autoencoder
+from .dataset import get_dataloader
+from .utils import TYPES_MAP, RunTypes
 
 
 def encode_data(autoencoder, data, device):
@@ -31,7 +33,8 @@ def train_knn(train_dataloader, autoencoder, device, n_neighbors=5):
     return knn
 
 
-def visualize_results(test_data, autoencoder, knn, device):
+def visualize_results(test_data, autoencoder, knn, device,
+                      run_type=RunTypes.NON_GEO.value):
     X_test, y_test = encode_data(autoencoder, test_data, device)
     y_pred = knn.predict(X_test)
     fig, ax = plt.subplots(figsize=(10, 5))
@@ -39,7 +42,7 @@ def visualize_results(test_data, autoencoder, knn, device):
     ax.hist(y_pred, bins=50, alpha=0.5, label="Predicted prices")
     ax.set_title("Distribution of predicted and true prices")
     ax.legend()
-    plt.savefig("results.png")
+    plt.savefig(f"results_{run_type}.png")
 
     mse = mean_squared_error(y_test, y_pred)
     mae = np.mean(np.abs(y_test - y_pred))
@@ -59,21 +62,26 @@ def visualize_results(test_data, autoencoder, knn, device):
         "Huber loss": format(huber_loss, ".2f"),
     }
 
-    with open("report.json", "w") as f:
-        json.dump(report, f)
+    with open(f"report.jsonl", "a") as f:
+        json.dump({"run type": run_type, "metrics": report}, f)
+        f.write("\n")
 
 
-if __name__ == "__main__":
+def run_training(run_type=RunTypes.NON_GEO.value):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print("Using device", device)
     autoencoder = Autoencoder(
-        n_data_features=31,
+        n_data_features=TYPES_MAP[run_type],
         n_encoder_hidden_features=128,
         n_decoder_hidden_features=128,
         n_latent_features=16,
     ).to(device)
-    autoencoder.load_state_dict(torch.load("autoencoder.pth"))
-    train_data, test_data = get_dataloader(batch_size=32)
+    autoencoder.load_state_dict(torch.load(f"autoencoder_{run_type}.pth"))
+    train_data, test_data = get_dataloader(batch_size=32, run_type=run_type)
     knn = train_knn(train_data, autoencoder, device)
-    visualize_results(test_data, autoencoder, knn, device)
+    visualize_results(test_data, autoencoder, knn, device, run_type=run_type)
     print("Done!")
+
+
+# if __name__ == "__main__":
+#     run_training(run_type=run_type)
