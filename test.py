@@ -19,5 +19,5 @@ def test_geo_emb(city_name):
 
 
 if __name__ == "__main__":
-    test_get_dataloader(run_type=RunTypes.GEO.value)
+    test_get_dataloader(run_type=RunTypes.OSM.value)
     # test_geo_emb(city_name="Gdynia, Poland")

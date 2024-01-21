@@ -14,13 +14,23 @@ DATA_PRICES = "./data/prices/"
 class RunTypes(Enum):
     NON_GEO = "non_geo"
     GEO = "geo"
+    OSM = "osm"
+    MEAN_OSM = "mean_osm"
     GEO_OSM = "geo_osm"
+    GEO_MEAN_OSM = "geo_mean_osm"
+
+
+GEO_TYPES = [RunTypes.GEO.value, RunTypes.GEO_OSM.value, RunTypes.GEO_MEAN_OSM.value]
+OSM_TYPES = [RunTypes.OSM.value, RunTypes.MEAN_OSM.value, RunTypes.GEO_OSM.value, RunTypes.GEO_MEAN_OSM.value]
 
 
 TYPES_MAP = {
     RunTypes.NON_GEO.value: 31,
     RunTypes.GEO.value: 42,
+    RunTypes.OSM.value: 73,
+    RunTypes.MEAN_OSM.value: 35,
     RunTypes.GEO_OSM.value: 82,
+    RunTypes.GEO_MEAN_OSM.value: 44,
 }
 
 

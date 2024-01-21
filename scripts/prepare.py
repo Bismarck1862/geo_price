@@ -10,23 +10,33 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from tqdm import tqdm
 
 from .geo_emb import get_embeddings
-from .utils import RunTypes, load_prices
+from .utils import RunTypes, load_prices, GEO_TYPES, OSM_TYPES
 
 warnings.filterwarnings("ignore")
 
 def get_features(data_df, run_type=RunTypes.NON_GEO.value):
     all_features = data_df.columns.to_list()
     exclude = ["id", "price"]
-    geo_features = [
-        "latitude",
-        "longitude",
+    non_osm_features = [
         "poiCount",
         *[col for col in all_features if "Distance" in col],
     ]
-    if run_type in [RunTypes.GEO.value, RunTypes.GEO_OSM.value]:
+    geo_features = [
+        "latitude",
+        "longitude",
+        *non_osm_features,
+    ]
+
+    if run_type in GEO_TYPES:
+        print("Using geo features")
         features = [col for col in all_features if col not in exclude]
         return features
+    elif run_type in OSM_TYPES:
+        print("Using osm features")
+        features = [col for col in all_features if col not in exclude + non_osm_features]
+        return features
     else:
+        print("Not using geo features")
         features = [col for col in all_features if col not in exclude + geo_features]
         return features
 
@@ -79,6 +89,7 @@ def preprocess(city, run_type=RunTypes.NON_GEO.value):
     prices = load_prices(city)
     feature_columns = get_features(prices, run_type=run_type)
     print(f"Number of features: {len(feature_columns)}")
+    print(f"Features: {feature_columns}")
     prices, feature_columns = clean_data(prices, feature_columns)
 
     numeric_transformer = Pipeline(steps=[("scaler", StandardScaler())])
@@ -94,7 +105,7 @@ def preprocess(city, run_type=RunTypes.NON_GEO.value):
             ("cat", categorical_transformer, categorical_features),
         ]
     )
-    if run_type == RunTypes.GEO_OSM.value:
+    if run_type in OSM_TYPES:
         geometries = [Point(longitude, latitude) \
                     for longitude, latitude in zip(prices["longitude"],
                                                     prices["latitude"])]
@@ -118,8 +129,16 @@ def preprocess(city, run_type=RunTypes.NON_GEO.value):
                 regions_list.append(list(region.to_dict()["geometry"].keys())[0])
         
         prices["region_id"] = regions_list
-        hex_embeddings.columns = [f"hex_{col}" for col in hex_embeddings.columns]
-        highway_embeddings.columns = [f"highway_{col}" for col in highway_embeddings.columns]
+        if run_type == RunTypes.GEO_MEAN_OSM.value or run_type == RunTypes.MEAN_OSM.value:
+            hex_columns = [col for col in hex_embeddings.columns if col != "region_id"]
+            hex_embeddings["hex_mean"] = hex_embeddings[hex_columns].mean(axis=1)
+            hex_embeddings.drop(columns=hex_columns, inplace=True)
+            highway_columns = [col for col in highway_embeddings.columns if col != "region_id"]
+            highway_embeddings["highway_mean"] = highway_embeddings[highway_columns].mean(axis=1)
+            highway_embeddings.drop(columns=highway_columns, inplace=True)
+        else:
+            hex_embeddings.columns = [f"hex_{col}" for col in hex_embeddings.columns]
+            highway_embeddings.columns = [f"highway_{col}" for col in highway_embeddings.columns]
         prices = prices.merge(hex_embeddings, on="region_id")
         prices = prices.merge(highway_embeddings, on="region_id")
 
