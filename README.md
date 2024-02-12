@@ -23,3 +23,17 @@
 dvc pull
 ```
 Po zalogowaniu w przeglądarce plik autoryzacyjny zapisze się w lokalizacji `../mycredentials.json`
+
+### Uruchomienie skryptu:
+```
+python run.py 
+``` 
+W kodzie można zdefiniować jaką metodę chcemy uruchomić.
+
+### Wymagania:
+```
+pip install -r requirements.txt
+```
+
+### Demo:
+W pliku `demo.ipynb` znajduje się podsumowanie wyników z wizualizacją wyników, w postaci wykresów i interaktywnych map.
