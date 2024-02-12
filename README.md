@@ -15,9 +15,6 @@
     └── demographic # folder z danymi demograficznymi
 ```
 
-### TO DO
-- [ ] demo
-
 ### Pozyskanie danych:
 ```
 dvc pull
