@@ -38,7 +38,7 @@ def run_encoding(run_type=RunTypes.NON_GEO.value):
         n_decoder_hidden_features=128,
         n_latent_features=16,
     ).to(device)
-    train_data, _ = get_dataloader(batch_size=32, run_type=run_type)
+    train_data, _, _, _ = get_dataloader(batch_size=32, run_type=run_type)
     print("Training...")
     autoencoder, train_metrics = train_encoder(
         autoencoder, train_data, epochs=100, lr=0.0001

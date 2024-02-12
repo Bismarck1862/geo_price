@@ -12,9 +12,12 @@ def get_dataloader(city=None, batch_size=32, run_type=RunTypes.NON_GEO.value):
     """Load data into DataLoader."""
     preprocessor, data_df = preprocess(city, run_type=run_type)
     print("Splitting data...")
+    X_data = data_df.drop("price", axis=1)
+    # X_data.drop("squareMeters", axis=1, inplace=True)
+    y_data = data_df["price"] / data_df['squareMeters']
     X_train, X_test, y_train, y_test = train_test_split(
-        data_df.drop("price", axis=1),
-        data_df["price"],
+        X_data,
+        y_data,
         test_size=0.3,
         random_state=RANDOM_STATE,
     )
@@ -33,4 +36,4 @@ def get_dataloader(city=None, batch_size=32, run_type=RunTypes.NON_GEO.value):
 
     train_data = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     test_data = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
-    return train_data, test_data
+    return train_data, test_data, X_test, y_test

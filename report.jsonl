@@ -1,6 +1,6 @@
-{"run type": "non_geo", "metrics": {"Mean squared error": "27841175552.00", "Mean absolute error": "101978.26", "Mean absolute percentage error": "13.72", "Huber loss": "101977.77"}}
-{"run type": "osm", "metrics": {"Mean squared error": "27095771136.00", "Mean absolute error": "101736.12", "Mean absolute percentage error": "13.86", "Huber loss": "101735.64"}}
-{"run type": "geo_osm", "metrics": {"Mean squared error": "26636994560.00", "Mean absolute error": "101091.77", "Mean absolute percentage error": "13.98", "Huber loss": "101091.29"}}
-{"run type": "geo_mean_osm", "metrics": {"Mean squared error": "26450982912.00", "Mean absolute error": "99731.94", "Mean absolute percentage error": "13.68", "Huber loss": "99731.45"}}
-{"run type": "geo", "metrics": {"Mean squared error": "25400487936.00", "Mean absolute error": "98098.10", "Mean absolute percentage error": "13.43", "Huber loss": "98097.60"}}
-{"run type": "mean_osm", "metrics": {"Mean squared error": "26107174912.00", "Mean absolute error": "97643.84", "Mean absolute percentage error": "12.95", "Huber loss": "97643.35"}}
+{"run type": "mean_osm", "metrics": {"Mean squared error": "5537059.00", "Mean absolute error": "1564.31", "Mean absolute percentage error": "12.37", "Huber loss": "1563.82"}}
+{"run type": "geo", "metrics": {"Mean squared error": "4165033.50", "Mean absolute error": "1383.24", "Mean absolute percentage error": "11.14", "Huber loss": "1382.75"}}
+{"run type": "osm", "metrics": {"Mean squared error": "4989777.50", "Mean absolute error": "1493.25", "Mean absolute percentage error": "11.90", "Huber loss": "1492.75"}}
+{"run type": "geo_mean_osm", "metrics": {"Mean squared error": "4195809.00", "Mean absolute error": "1374.61", "Mean absolute percentage error": "11.14", "Huber loss": "1374.12"}}
+{"run type": "geo_osm", "metrics": {"Mean squared error": "4236872.50", "Mean absolute error": "1385.06", "Mean absolute percentage error": "11.18", "Huber loss": "1384.57"}}
+{"run type": "non_geo", "metrics": {"Mean squared error": "5793060.00", "Mean absolute error": "1611.02", "Mean absolute percentage error": "12.90", "Huber loss": "1610.53"}}
