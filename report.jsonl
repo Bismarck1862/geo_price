@@ -1,0 +1,6 @@
+{"run type": "mean_osm", "metrics": {"Mean squared error": "5537059.00", "Mean absolute error": "1564.31", "Mean absolute percentage error": "12.37", "Huber loss": "1563.82"}}
+{"run type": "geo", "metrics": {"Mean squared error": "4165033.50", "Mean absolute error": "1383.24", "Mean absolute percentage error": "11.14", "Huber loss": "1382.75"}}
+{"run type": "osm", "metrics": {"Mean squared error": "4989777.50", "Mean absolute error": "1493.25", "Mean absolute percentage error": "11.90", "Huber loss": "1492.75"}}
+{"run type": "geo_mean_osm", "metrics": {"Mean squared error": "4195809.00", "Mean absolute error": "1374.61", "Mean absolute percentage error": "11.14", "Huber loss": "1374.12"}}
+{"run type": "geo_osm", "metrics": {"Mean squared error": "4236872.50", "Mean absolute error": "1385.06", "Mean absolute percentage error": "11.18", "Huber loss": "1384.57"}}
+{"run type": "non_geo", "metrics": {"Mean squared error": "5793060.00", "Mean absolute error": "1611.02", "Mean absolute percentage error": "12.90", "Huber loss": "1610.53"}}

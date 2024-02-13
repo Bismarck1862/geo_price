@@ -1,0 +1,8 @@
+/data
+__pycache__/
+autoencoder*
+geo_prices_vis
+mycredentials.json
+example.ipynb
+test_df.pkl
+test_df1.pkl
